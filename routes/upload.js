@@ -9,7 +9,7 @@ var des=multer.diskStorage({
             length:10,
             includeSymbols:['@','$','!','^','&']
         })
-        req.body.filename=id
+        req.body['filename']=id
         path(null,(id+".png"));
     }
 })

@@ -67,6 +67,7 @@ async function resizeImage(filename,width,height) {
 
 router.post("/setbackground",upload.single("picture"),async(req,res)=>{
     try{
+        console.log(req.body)
         let eventType=req.body.eventType
         let keyword=req.body.keyword
         let url=`https://www.google.com/search?q=${eventType}+${keyword}&sxsrf=AOaemvIbrtqI8yK9GHNcFZYRidCXKotN5A:1639203389198&source=lnms&tbm=isch&sa=X&ved=2ahUKEwi0t-i9jNv0AhWNNpQKHbX0CkIQ_AUoAXoECAEQAw&biw=1366&bih=657&dpr=1`
