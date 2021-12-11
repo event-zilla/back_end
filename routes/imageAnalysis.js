@@ -1,7 +1,6 @@
 const sharp=require("sharp")
 const file=require("fs")
 const axios = require("axios");
-const cheerio = require("cheerio");
 const http = require('http')
 const https = require('https');
 var Stream = require('stream').Transform;

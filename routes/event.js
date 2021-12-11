@@ -1,6 +1,8 @@
 const express=require("express")
 const router=express.Router()
 const upload=require("./upload")
+const axios=require("axios");
+const cheerio = require("cheerio");
 const {downloadImageFromURL,deleteImage,resizeImage,mergeImage}=require("./imageAnalysis");
 
 router.post("/setbackground",upload.single("picture"),async(req,res)=>{
