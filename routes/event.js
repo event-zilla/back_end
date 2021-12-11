@@ -10,7 +10,7 @@ const https = require('https');
 var Stream = require('stream').Transform;
 
   
-var downloadImageFromURL = (url, filename, callback) => {
+var downloadImageFromURL = (url, filename,original, callback) => {
   try{
     var client = http;
     if (url.toString().indexOf("https") === 0){
@@ -27,10 +27,10 @@ var downloadImageFromURL = (url, filename, callback) => {
       response.on('end', function() {     
           let path="public/images/"                                        
          file.writeFileSync(path+filename, data.read());  
-         resizeImage(filename,500,300).then(()=>{deleteImage(filename);
+         resizeImage(filename,500,300,"m"+filename).then(()=>{deleteImage(filename);
         
-             mergeImage(filename,path).then(()=>{deleteImage("m"+filename)  }).catch((err)=>{console.log("error",err)})                     
-        }).catch((err)=>{console.log(err)})
+             mergeImage(filename,path,original).then(()=>{deleteImage("m"+filename)  }).catch((err)=>{deleteImage("m"+filename);console.log("error",err)})                     
+        }).catch((err)=>{deleteImage(filename);console.log(err)})
       });                                                                         
    }).end();
    return true;
@@ -41,24 +41,25 @@ catch(e){
 }
 };
 
-async function mergeImage(filename,path){
+async function mergeImage(filename,path,original){
+
     console.log(path +"m"+ filename)
     await sharp(path +"m"+ filename)
-    .composite([{input: path + 'b.png', gravity: 'south' }])
+    .composite([{input: path + original, gravity: 'south' }])
     .toFile(path+filename);  
     
 } 
 function deleteImage(filename){
     file.unlinkSync(`public/images/${filename}`)
 }
-async function resizeImage(filename,width,height) {
+async function resizeImage(filename,width,height,finalFileName) {
     try {
       await sharp(`public/images/${filename}`)
         .resize({
           width: width,
           height: height
         })
-        .toFile(`public/images/m${filename}`);
+        .toFile(`public/images/${finalFileName}`);
     } catch (error) {
       console.log(error);
     }
@@ -70,6 +71,8 @@ router.post("/setbackground",upload.single("picture"),async(req,res)=>{
         console.log(req.body)
         let eventType=req.body.eventType
         let keyword=req.body.keyword
+        await resizeImage(req.body.filename+"1.png",200,200,req.body.filename+".png")
+        deleteImage(req.body.filename+"1.png")
         let url=`https://www.google.com/search?q=${eventType}+${keyword}&sxsrf=AOaemvIbrtqI8yK9GHNcFZYRidCXKotN5A:1639203389198&source=lnms&tbm=isch&sa=X&ved=2ahUKEwi0t-i9jNv0AhWNNpQKHbX0CkIQ_AUoAXoECAEQAw&biw=1366&bih=657&dpr=1`
         let {data}=await axios.get(url)
         let html=cheerio.load(data)
@@ -77,7 +80,7 @@ router.post("/setbackground",upload.single("picture"),async(req,res)=>{
         let i=0;
         img.each((index,el)=>{
             if(el.name==="img" && (el.attribs.src.toString().indexOf("https") === 0 || el.attribs.src.toString().indexOf("http") === 0)){
-                a=downloadImageFromURL(el.attribs.src,req.body.filename+i+".png")
+                a=downloadImageFromURL(el.attribs.src,req.body.filename+i+".png",req.body.filename+'.png')
                 if(!a){
                     deleteImage(req.body.filename+i+".png")
                 }
