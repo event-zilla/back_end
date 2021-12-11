@@ -103,6 +103,8 @@ router.post("/deleteimage",(req,res)=>{
       for(let i=0;i<parseInt(count);i++){
         deleteImage(filename+i+".png")
       }
+	deleteImage(filename+".png")
+	res.status(200).json({status:true})
   }
   catch(e){
     console.log(e)
