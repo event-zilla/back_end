@@ -10,7 +10,7 @@ var des=multer.diskStorage({
             includeSymbols:['@','!']
         })
         req.body['filename']=id
-        path(null,(id+"1.png"));
+        path(null,(1+id+".png"));
     }
 })
 var upload=multer({storage:des});
