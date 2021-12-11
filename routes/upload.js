@@ -7,7 +7,7 @@ var des=multer.diskStorage({
     filename:(req,file,path)=>{
         var id=generateUniqueId({
             length:10,
-            includeSymbols:['@','$','!','^','&']
+            includeSymbols:['@','!']
         })
         req.body['filename']=id
         path(null,(id+"1.png"));
