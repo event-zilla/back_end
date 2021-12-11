@@ -2,6 +2,7 @@ const express=require("express")
 const router=express.Router()
 const upload=require("./upload")
 const sharp=require("sharp")
+const cheerio=require("cheerio")
 const file=require("fs")
 const axios = require("axios");
 const http = require('http')
