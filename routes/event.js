@@ -119,7 +119,8 @@ router.post("/uploadimage",upload.single("picture"),(req,res)=>{
   let pool=db()
   try{
     let id=req.body.filename;
-    uploadImage(id,pool)
+    uploadImage(id,pool).then(()=>{return res.status(200).json({status:true})}).catch((err)=>{throw(err)})
+
   }
   catch(e){
     console.log(e)
@@ -147,7 +148,7 @@ console.log(e)
   }
 })
 
-const uploadImage=(id,pool)=>{
+const uploadImage=async(id,pool)=>{
   pool.run("insert into gallery (image) values(?)",[id+".png"],(err)=>{
     if(err){
       pool.close();
@@ -155,7 +156,7 @@ const uploadImage=(id,pool)=>{
     }
     else{
       pool.close();
-      return res.status(200).json({status:true})
+      
     }
   })
 }
