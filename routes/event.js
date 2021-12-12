@@ -88,7 +88,7 @@ router.post("/setbackground",upload.single("picture"),async(req,res)=>{
             }
         })
         let pool=db()
-        uploadImage(id,pool)
+        uploadImage(req.body.filename,pool)
         return res.status(200).json({status:true,filename:req.body.filename,count:i})
     }
     catch(e){
@@ -106,7 +106,6 @@ router.post("/deleteimage",(req,res)=>{
       for(let i=0;i<parseInt(count);i++){
         deleteImage(filename+i+".png")
       }
-	deleteImage(filename+".png")
 	res.status(200).json({status:true})
   }
   catch(e){
