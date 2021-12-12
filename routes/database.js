@@ -1,7 +1,7 @@
 const sqlite=require("sqlite3").verbose()
 
 const database=()=>{
-    const db=new sqlite.Database("./event.db",sqlite.OPEN_READWRITE,(err)=>{
+    const db=new sqlite.Database("./event.db",(err)=>{
         if(err){
             console.log(err)
         }
