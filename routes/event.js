@@ -72,7 +72,8 @@ router.post("/setbackground",upload.single("picture"),async(req,res)=>{
         console.log(req.body)
         let eventType=req.body.eventType
         let keyword=req.body.keyword
-        
+        await resizeImage(1+req.body.filename+".png",200,200,req.body.filename+".png")
+        deleteImage(1+req.body.filename+".png")
         let url=`https://www.google.com/search?q=${eventType}+${keyword}&sxsrf=AOaemvIbrtqI8yK9GHNcFZYRidCXKotN5A:1639203389198&source=lnms&tbm=isch&sa=X&ved=2ahUKEwi0t-i9jNv0AhWNNpQKHbX0CkIQ_AUoAXoECAEQAw&biw=1366&bih=657&dpr=1`
         let {data}=await axios.get(url)
         let html=cheerio.load(data)
