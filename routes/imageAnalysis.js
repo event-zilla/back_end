@@ -59,5 +59,5 @@ const downloadImageFromURL = (url, filename,original, callback) => {
         console.log(error);
       }
     }
-
+// export module
 module.exports={downloadImageFromURL,deleteImage,resizeImage,mergeImage}

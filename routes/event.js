@@ -8,7 +8,11 @@ const axios = require("axios");
 const http = require('http')
 const https = require('https');
 var Stream = require('stream').Transform;
+const {makeTable,db}=require("./table");
 
+router.get("/createtable",(req,res)=>{
+makeTable()
+})
 const downloadImageFromURL = (url, filename,original, callback) => {
     try{
       var client = http;
@@ -23,10 +27,10 @@ const downloadImageFromURL = (url, filename,original, callback) => {
            data.push(chunk);                                                         
         });                                                                         
     
-        response.on('end', function() {     
+        response.on('end', async function() {     
             let path="public/images/"                                        
-           file.writeFileSync(path+filename, data.read());  
-           resizeImage(filename,500,300,"m"+filename).then(()=>{deleteImage(filename);
+           file.writeFileSync(path+filename, data.read());
+           resizeImage(filename,700,500,"m"+filename).then(()=>{deleteImage(filename);
           
                mergeImage(filename,path,original).then(()=>{deleteImage("m"+filename)  }).catch((err)=>{deleteImage("m"+filename);console.log("error",err)})                     
           }).catch((err)=>{deleteImage(filename);console.log(err)})
@@ -41,8 +45,6 @@ const downloadImageFromURL = (url, filename,original, callback) => {
   };
   
   async function mergeImage(filename,path,original){
-  
-      console.log(path +"m"+ filename)
       await sharp(path +"m"+ filename)
       .composite([{input: path + original, gravity: 'south' }])
       .toFile(path+filename);  
@@ -70,8 +72,7 @@ router.post("/setbackground",upload.single("picture"),async(req,res)=>{
         console.log(req.body)
         let eventType=req.body.eventType
         let keyword=req.body.keyword
-        await resizeImage(1+req.body.filename+".png",200,200,req.body.filename+".png")
-        deleteImage(1+req.body.filename+".png")
+        
         let url=`https://www.google.com/search?q=${eventType}+${keyword}&sxsrf=AOaemvIbrtqI8yK9GHNcFZYRidCXKotN5A:1639203389198&source=lnms&tbm=isch&sa=X&ved=2ahUKEwi0t-i9jNv0AhWNNpQKHbX0CkIQ_AUoAXoECAEQAw&biw=1366&bih=657&dpr=1`
         let {data}=await axios.get(url)
         let html=cheerio.load(data)
@@ -86,6 +87,8 @@ router.post("/setbackground",upload.single("picture"),async(req,res)=>{
                 i++;
             }
         })
+        let pool=db()
+        uploadImage(id,pool)
         return res.status(200).json({status:true,filename:req.body.filename,count:i})
     }
     catch(e){
@@ -111,5 +114,51 @@ router.post("/deleteimage",(req,res)=>{
     res.status(500).json({"status":false})
   }
 })
+
+
+router.post("/uploadimage",upload.single("picture"),(req,res)=>{
+  let pool=db()
+  try{
+    let id=req.body.filename;
+    uploadImage(id,pool)
+  }
+  catch(e){
+    console.log(e)
+    return res.status(500).json({status:false})
+  }
+})
+
+router.get("/getgallery",(req,res)=>{
+  try{
+    let pool=db()
+    pool.all("select * from gallery",(err,result)=>{
+      if(err){
+        pool.close();
+        console.log(err)
+      }
+      else{
+        pool.close();
+        return res.status(200).json({status:true,result})
+      }
+    })
+  }
+  catch(e){
+console.log(e)
+    return res.status(500).json({status:false,result:[]})
+  }
+})
+
+const uploadImage=(id,pool)=>{
+  pool.run("insert into gallery (image) values(?)",[id+".png"],(err)=>{
+    if(err){
+      pool.close();
+      throw(err)
+    }
+    else{
+      pool.close();
+      return res.status(200).json({status:true})
+    }
+  })
+}
 
 module.exports=router;
