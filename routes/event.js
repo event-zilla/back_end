@@ -119,7 +119,7 @@ router.post("/deleteimage",(req,res)=>{
 router.post("/uploadimage",upload.single("picture"),(req,res)=>{
   let pool=db()
   try{
-    let id=req.body.filename;
+    let id=1+req.body.filename;
     uploadImage(id,pool).then(()=>{return res.status(200).json({status:true})}).catch((err)=>{throw(err)})
 
   }
